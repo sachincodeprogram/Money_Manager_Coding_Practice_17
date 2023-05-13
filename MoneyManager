@@ -1,0 +1,410 @@
+import {Component} from 'react'
+import {v4} from 'uuid'
+
+import TransactionItem from '../TransactionItem'
+import MoneyDetails from '../MoneyDetails'
+
+import './index.css'
+
+const transactionTypeOptions = [
+  {
+    optionId: 'INCOME',
+    displayText: 'Income',
+  },
+  {
+    optionId: 'EXPENSES',
+    displayText: 'Expenses',
+  },
+]
+
+// Write your code here
+class MoneyManager extends Component {
+  state = {
+    transactionsList: [],
+    titleInput: '',
+    amountInput: '',
+    optionId: transactionTypeOptions[0].optionId,
+  }
+
+  deleteTransaction = id => {
+    const {transactionsList} = this.state
+    const updateTransactionList = transactionsList.filter(
+      eachTran => id !== eachTran.id,
+    )
+
+    this.setState({
+      transactionsList: updateTransactionList,
+    })
+  }
+  onAddTransaction = event => {
+    event.preventDefault()
+    const {titleInput, amountInput, optionId} = this.state
+    const typeOption = transactionTypeOptions.find(
+      each => each.optionId === optionId,
+    )
+    const {displayText} = typeOption
+    const newTransaction = {
+      id: v4(),
+      title: titleInput,
+      amount: parseInt(amountInput),
+      type: displayText,
+    }
+    this.setState(prevState => ({
+      transactionsList: [...prevState.transactionsList, newTransaction],
+      titleInput: '',
+      amountInput: '',
+      optionId: transactionTypeOptions[0].optionId,
+    }))
+  }
+  onChangeOptionId = event => {
+    this.setState({optionId: event.target.value})
+  }
+
+  onChangeAmountInput = event => {
+    this.setState({amountInput: event.target.value})
+  }
+  onChangeTitleInput = event => {
+    this.setState({titleInput: event.target.value})
+  }
+  getExpenses = () => {
+    const {transactionsList} = this.state
+    let expensesAmount = 0
+
+    transactionsList.forEach(eachTransaction => {
+      if (eachTransaction.type === transactionTypeOptions[1].displayText) {
+        expensesAmount += eachTransaction.amount
+      }
+    })
+    return expensesAmount
+  }
+  getIncome = () => {
+    const {transactionsList} = this.state
+    let incomeAmount = 0
+
+    transactionsList.forEach(eachTransaction => {
+      if (eachTransaction.type === transactionTypeOptions[0].displayText) {
+        incomeAmount += eachTransaction.amount
+      }
+    })
+    return incomeAmount
+  }
+  getBalance = () => {
+    const {transactionsList} = this.state
+    let balanceAmount = 0
+    let incomeAmount = 0
+    transactionsList.forEach(eachTransaction => {
+      if (eachTransaction.type === transactionTypeOptions[0].displayText) {
+        incomeAmount += eachTransaction.amount
+      } else {
+        expensesAmount += eachTransaction.amount
+      }
+    })
+    balanceAmount = incomeAmount - expensesAmount
+    return balanceAmount
+  }
+  render() {
+    const {titleInput, amountInput, optionId, transactionsList} = this.state
+    const balanceAmount = this.getBalance()
+    const incomeAmount = this.getIncome()
+    const expensesAmount = this.getExpenses()
+    return (
+      <div className="app-container">
+        <div className="responsive-container">
+          <div className="header-container">
+            <h1 className="heading">Hi, Richard</h1>
+            <p className="header-content">
+              Welcome back to your{' '}
+              <span className="money-manager-text">Money Manager</span>
+            </p>
+          </div>
+          <MoneyDetails
+            balanceAmount={balanceAmount}
+            incomeAmount={incomeAmount}
+            expensesAmount={expensesAmount}
+          />
+          <div className="transaction-details">
+            <form className="transaction-form" onSubmit={this.onAddTransaction}>
+              <h1 className="transaction-header">Add Transaction</h1>
+              <label className="input-label" htmlFor="title">
+                TITLE
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={titleInput}
+                onChange={this.onChangeTitleInput}
+                className="input"
+                placeholder="TITLE"
+              />
+              <label className="input-label" htmlFor="amount">
+                AMOUNT
+              </label>
+              <input
+                type="text"
+                id="amount"
+                className="input"
+                value={amountInput}
+                onChange={this.onChangeAmountInput}
+                placeholder="AMOUNT"
+              />
+              <label className="input-label" htmlFor="select">
+                TYPE
+              </label>
+              <select
+                id="select"
+                className="input"
+                value={optionId}
+                onChange={this.onChangeOptionId}
+              >
+                {transactionTypeOptions.map(each => (
+                  <option key={each.optionId} value={each.optionId}>
+                    {each.displayText}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="button">
+                Add
+              </button>
+            </form>
+            <div className="history-transactions">
+              <h1 className="transactions-header">History</h1>
+              <div className="transactions-table-container">
+                <ul className="transactions-table">
+                  <li className="table-header">
+                    <p className="table-header-cell">Title</p>
+                    <p className="table-header-cell">Amount</p>
+                    <p className="table-header-cell">Type</p>
+                  </li>
+                  {transactionsList.map(eachtrasa => (
+                    <TransactionItem
+                      key={eachtrasa.id}
+                      transactionDetails={eachtrasa}
+                      deleteTransaction={this.deleteTransaction}
+                    />
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default MoneyManager
+
+
+
+
+
+
+
+
+
+
+
+/* Write your CSS here */
+.app-container {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+.responsive-container {
+  width: 80%;
+  max-width: 550px;
+}
+
+@media screen and (min-width: 768px) {
+  .responsive-container {
+    max-width: 1140px;
+  }
+}
+.header-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-image: url('https://assets.ccbp.in/frontend/react-js/money-manager/money-manager-bg.png');
+  background-size: cover;
+  height: 172px;
+  border-radius: 16px;
+  margin-top: 64px;
+}
+@media screen and (min-width: 768px) {
+  .header-container {
+    align-items: flex-start;
+    padding: 48px;
+  }
+}
+.heading {
+  color: #475569;
+  font-family: 'Roboto';
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+@media screen and (min-width: 768px) {
+  .heading {
+    font-size: 30px;
+  }
+}
+.header-content {
+  color: #475569;
+  font-family: 'Roboto';
+  font-size: 14px;
+  margin: 0px;
+}
+@media screen and (min-width: 768px) {
+  .header-container {
+    font-size: 18px;
+  }
+}
+.money-manager-text {
+  color: #0b69ff;
+  font-weight: 500;
+}
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 24px;
+}
+@media screen and (min-width: 768px) {
+  .transaction-details {
+    flex-direction: row;
+  }
+}
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  height: 424px;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding-top: 24px;
+  padding-right: 24px;
+  padding-left: 24px;
+  padding-bottom: 32px;
+}
+@media screen and (min-width: 768px) {
+  .transaction-form {
+    width: 40%;
+    padding-right: 43px;
+    padding-left: 48px;
+  }
+}
+.transaction-header {
+  color: #475569;
+  font-family: 'Roboto';
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+@media screen and (min-width: 768px) {
+  .transaction-header {
+    font-size: 20px;
+  }
+}
+.input-label {
+  color: #7e858e;
+  font-family: 'Roboto';
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0px;
+}
+.input {
+  color: #1e293b;
+  background-color: #fff;
+  font-family: 'Roboto';
+  border: 1px solid #d7dfe9;
+  border-radius: 2px;
+  width: 100%;
+  height: 40px;
+  outline: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  min-width: 157px;
+}
+.button {
+  background-color: #0b69ff;
+  color: #fff;
+  font-family: 'Roboto';
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 25px;
+  border-radius: 6px;
+  border: none;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-right: 24px;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.history-transactions {
+  width: 100%;
+  min-height: 326px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding-left: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-right: 24px;
+  margin-top: 32px;
+}
+@media screen and (min-width: 768px) {
+  .history-transactions {
+    width: 55%;
+    min-height: 424px;
+    padding-top: 24px;
+    padding-left: 28px;
+    padding-right: 41px;
+    padding-bottom: 40px;
+    margin-top: 0px;
+    margin-left: 32px;
+  }
+}
+.transactions-table-container {
+  height: 100%;
+  border-radius: 8px;
+}
+.transactions-table {
+  padding-left: 0;
+  margin: 0px;
+}
+.table-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 48px;
+  list-style-type: none;
+  border: 1px solid #cbd5e1;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+@media screen and (min-width: 768px) {
+  .table-header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+.table-header-cell {
+  color: #334155;
+  font-family: 'Roboto';
+  font-size: 12px;
+  font-weight: 500;
+  width: 30%;
+  border-radius: none;
+}
+@media screen and (min-width: 768px) {
+  .table-header-cell {
+    font-size: 16px;
+  }
+}
