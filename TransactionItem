@@ -1,0 +1,93 @@
+// Write your code here
+import '/index.css'
+
+const TransactionItem = props => {
+  const {transactionDetails, deleteTransaction} = props
+  const {id, title, amount, type} = transactionDetails
+
+  const ondeleteTransaction = () => {
+    deleteTransaction(id)
+  }
+  return (
+    <li className="table-row">
+      <p className="p">{title}</p>
+      <p className="p">Rs {amount}</p>
+      <p className="p">{type}</p>
+      <div className="delete-container">
+        <button
+          className="delete-button"
+          type="button"
+          onClick={ondeleteTransaction}
+          data-testid="delete"
+        >
+          <img
+            className="delete-img"
+            src="https://assets.ccbp.in/frontend/react-js/money-manager/delete.png"
+            alt="delete"
+          />
+        </button>
+      </div>
+    </li>
+  )
+}
+
+export default TransactionItem
+
+
+
+
+
+
+
+/* Write your CSS here */
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  list-style-type: none;
+  border-bottom: 1px solid #cbd5e1;
+  border-radius: 1px solid #cbd5e1;
+  border-left: 1px solid #cbd5e1;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@media screen and (min-width: 768px) {
+  .table-row {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+.p {
+  color: #475569;
+  font-family: 'Roboto';
+  font-size: 12px;
+  width: 30%;
+}
+@media screen and (min-width: 768px) {
+  .p {
+    font-size: 14px;
+  }
+}
+.delete-container {
+  display: flex;
+  width: 10%;
+}
+.delete-button {
+  background: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+.delete-img {
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  align-self: center;
+  border: none;
+  outline: none;
+}
+@media screen and (min-width: 768px) {
+  .delete-img {
+    margin-right: 24px;
+  }
+}
