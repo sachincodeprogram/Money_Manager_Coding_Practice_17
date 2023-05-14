@@ -92,6 +92,7 @@ class MoneyManager extends Component {
     const {transactionsList} = this.state
     let balanceAmount = 0
     let incomeAmount = 0
+    let balanceAmount = 0
     transactionsList.forEach(eachTransaction => {
       if (eachTransaction.type === transactionTypeOptions[0].displayText) {
         incomeAmount += eachTransaction.amount
